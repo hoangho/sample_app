@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_secure_password
 
   before_save { |new_user| new_user.email.downcase! }
+  before_save :create_remember_token
 
   # Validates
   validates :name, presence: true, length: {:maximum => 50}
@@ -31,4 +32,11 @@ class User < ActiveRecord::Base
   # 	self.email = "Unknown email"
   # 	self
   # end
+
+  private 
+    def create_remember_token
+      self.remember_token = SecureRandom.urlsafe_base64
+      #If you are using Ruby 1.8.7, you should use SecureRandom.hex here instead
+      # self.remember_token = SecureRandom.hex
+    end
 end
