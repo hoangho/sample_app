@@ -1,13 +1,23 @@
 class UsersController < ApplicationController
+  before_filter :signed_in_user, only: [:index, :edit, :update]
+  before_filter :correct_user, only: [:edit, :update]
+  before_filter :admin_user, only: [:destroy]
 	# GET /posts
   # GET /posts.json
   def index
+    # @users = User.paginate(page: params[:page])
+    # @users = User.paginate(params[:search], params[:page])
+    # @users = User.paginate(:page => params[:page])
+    # @users = User.all
+    # @title = "All users"
+    # @users = User.paginate(:per_page => 10, :page => params[:page])
+    # @users = 
+    # @users = User.paginate(:page => 1, :per_page => 10)
     @users = User.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @users }
-    end
+    # respond_to do |format|
+    #   format.html # index.html.erb
+    #   format.json { render json: @users }
+    # end
   end
 
 # GET /posts/1
@@ -48,4 +58,56 @@ class UsersController < ApplicationController
     #   end
     # end
   end
+
+  def index
+    @users = User.all
+  end
+
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    if @user.update_attributes(params[:user])
+      sign_in @user
+      flash[:success] = "User profile was updated successfully"
+      redirect_to @user
+    else
+      render 'edit'
+    end
+  end
+
+  def destroy
+    @user = User.find(params[:id])
+    if @user.destroy
+      flash[:success] = "Delete user #{@user.name} successfully"
+      redirect_to users_path
+    else
+      # flash[:error] = "Delete user #{@user.name} failed"
+      # redirect_to root_path
+    end
+  end
+
+  private
+
+    def signed_in_user
+      unless signed_in?
+        store_location
+        redirect_to signin_path, notice: "Please sign in" unless signed_in?
+      end
+    end
+
+    def correct_user
+      if User.all.any? { |user| user.id.to_s == params[:id] }
+        @user = User.find(params[:id])
+        redirect_to root_path unless current_user?(@user)
+      else
+        redirect_to root_path, notice: "The page your requested does not existed"
+      end
+    end
+
+    def admin_user
+      redirect_to(root_path) unless current_user.admin?
+    end
 end

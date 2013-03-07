@@ -33,6 +33,15 @@ class User < ActiveRecord::Base
   # 	self
   # end
 
+
+
+  def self.search(search, page)
+    paginate :per_page => 5, :page => page,
+           :conditions => ['name like ?', "%#{search}%"],
+           :order => 'name'
+  end
+
+
   private 
     def create_remember_token
       self.remember_token = SecureRandom.urlsafe_base64
