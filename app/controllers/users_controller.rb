@@ -5,26 +5,20 @@ class UsersController < ApplicationController
 	# GET /posts
   # GET /posts.json
   def index
-    # @users = User.paginate(page: params[:page])
-    # @users = User.paginate(params[:search], params[:page])
-    # @users = User.paginate(:page => params[:page])
-    # @users = User.all
-    # @title = "All users"
-    # @users = User.paginate(:per_page => 10, :page => params[:page])
-    # @users = 
-    # @users = User.paginate(:page => 1, :per_page => 10)
     @users = User.all
-    # respond_to do |format|
-    #   format.html # index.html.erb
-    #   format.json { render json: @users }
-    # end
   end
 
 # GET /posts/1
   # GET /posts/1.json
 	def show
     @user = User.find(params[:id])
-  	end
+    if current_user
+       @micropost = current_user.microposts.build
+     else
+      store_location
+      redirect_to signin_path
+    end
+  end
 
   def new
   	@user = User.new
