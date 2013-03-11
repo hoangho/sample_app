@@ -1,0 +1,11 @@
+<% @feed_items.each do |f| %>
+	<b><%= link_to f.user.name %></b> :  <%= f.content%>
+	<br />
+	<span class="timestamp">
+    	Posted <%= time_ago_in_words(f.created_at) %> ago.
+  	</span>
+  	<% if current_user.admin? || current_user?(f.user) %>
+  		|  <%= link_to "Delete", f, method: :delete, data: {confirm: "Are you sure? "} %>
+  	<% end %>
+  	<br />
+<% end %>
